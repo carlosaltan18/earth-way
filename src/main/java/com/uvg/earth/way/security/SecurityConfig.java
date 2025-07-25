@@ -1,6 +1,6 @@
 package com.uvg.earth.way.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,19 +13,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
     private JwtAuthFilter jwtAuthFilter;
-    @Autowired
     private AuthenticationProvider authenticationProvider;
+    private static final String ADMIN = "ADMIN";
+    private static final String USER = "USER";
+
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/api/v1/user/**").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/user/**").hasAnyRole(USER, ADMIN)
+                                .requestMatchers("/api/v1/organization/**").hasRole(ADMIN)
+                                .requestMatchers("/api/v1/post/**").permitAll()
+                                .requestMatchers("/api/v1/report/**").hasRole(ADMIN)
+                                .requestMatchers("/api/v1/role/**").hasRole(ADMIN)
                                 .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
