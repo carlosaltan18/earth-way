@@ -19,7 +19,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping(value = "/")
+    /*@GetMapping(value = "/")
     public ResponseEntity<?> getAllUsers(){
         try {
             Map<String, List<User>> resp = new HashMap<>();
@@ -31,5 +31,5 @@ public class UserController {
             resp.put("error", e.getMessage());
             return ResponseEntity.internalServerError().body(resp);
         }
-    }
+    }*/
 }
