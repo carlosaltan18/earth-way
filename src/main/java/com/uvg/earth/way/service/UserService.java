@@ -3,12 +3,14 @@ package com.uvg.earth.way.service;
 import java.util.Optional;
 
 import com.uvg.earth.way.dto.UserDto;
+import com.uvg.earth.way.exception.UserDeletionException;
 import com.uvg.earth.way.exception.UserNotFoundException;
 import com.uvg.earth.way.model.User;
 import com.uvg.earth.way.repository.UserRepository;
 import com.uvg.earth.way.service.interfaces.IUserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,8 @@ public class UserService implements IUserService {
 
     private UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private static final String USER_WITH = "User with id ";
+    private static final String DONT_EXIST = "Don't exist";
 
     @Override
     public User findUserById(Long id) {
@@ -48,8 +52,15 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void deleteUser(User user) {
-        userRepository.delete(user);
+    public void deleteUser(Long idUser) {
+        if (!userRepository.existsById(idUser)) {
+            throw new IllegalArgumentException(USER_WITH + idUser + DONT_EXIST);
+        }
+        try {
+            userRepository.deleteById(idUser);
+        } catch (DataAccessException e) {
+            throw new UserDeletionException("Error deleting user with ID " + idUser, e);
+        }
     }
 
     @Override

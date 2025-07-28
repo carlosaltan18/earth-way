@@ -43,5 +43,7 @@ public class Event {
 
     @ManyToMany
     private List<User> participants;
+
+    private boolean finised;
 }
 

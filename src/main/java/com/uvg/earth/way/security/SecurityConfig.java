@@ -20,6 +20,7 @@ public class SecurityConfig {
     private AuthenticationProvider authenticationProvider;
     private static final String ADMIN = "ADMIN";
     private static final String USER = "USER";
+    private static final String ORGANIZATION = "ORGANIZATION";
 
 
     @Bean
@@ -27,11 +28,14 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/api/v1/user/**").hasAnyRole(USER, ADMIN)
-                                .requestMatchers("/api/v1/organization/**").hasRole(ADMIN)
+                                .requestMatchers("/v3/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/swagger-resources/**").permitAll()
+                                .requestMatchers("/api/v1/user/**").hasAnyRole(USER, ADMIN, ORGANIZATION)
+                                .requestMatchers("/api/v1/organization/**").hasAnyRole(ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/post/**").permitAll()
-                                .requestMatchers("/api/v1/report/**").hasRole(ADMIN)
-                                .requestMatchers("/api/v1/role/**").hasRole(ADMIN)
+                                .requestMatchers("/api/v1/report/**").hasAnyRole(USER, ADMIN, ORGANIZATION)
+                                .requestMatchers("/api/v1/role/**").hasAnyRole(ADMIN)
                                 .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
