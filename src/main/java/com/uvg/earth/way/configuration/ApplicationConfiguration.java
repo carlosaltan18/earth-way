@@ -1,7 +1,7 @@
 package com.uvg.earth.way.configuration;
 
 import com.uvg.earth.way.service.UserDetailServicesImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,8 +11,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
+@AllArgsConstructor
 public class ApplicationConfiguration {
-    @Autowired
     private UserDetailServicesImpl userDetailServicesImpl;
 
     @Bean
