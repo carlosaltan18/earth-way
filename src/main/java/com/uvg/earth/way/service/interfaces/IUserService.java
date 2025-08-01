@@ -1,17 +1,27 @@
 package com.uvg.earth.way.service.interfaces;
 
+import com.uvg.earth.way.dto.UserDto;
 import com.uvg.earth.way.model.User;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface IUserService {
     User findUserById(Long id);
 
-    List<User> getAllUsers();
-
     void saveUser(User user);
 
-    void deleteUser(User user);
+    void deleteUser(Long id);
 
     User findUserByEmail(String email);
+
+    void updateUser(UserDto user, Long idUser);
+
+    Optional<User> findByEmail(String email);
+
+    Optional<User> findById(Long id);
+
+    Page<User> getAllUsers(int page, int size, String email);
+
+    void changePassword(Long idUser, String newPassword, String confirmPassword);
 }

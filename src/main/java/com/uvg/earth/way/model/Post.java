@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -19,11 +20,15 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title is required")
+    private String title;
+
     @NotBlank(message = "Content is required")
     @Column(columnDefinition = "TEXT")
     private String content;
 
     private LocalDate postDate;
+    private List<String> images;
 
     @ManyToOne
     @JoinColumn(name = "author_id")

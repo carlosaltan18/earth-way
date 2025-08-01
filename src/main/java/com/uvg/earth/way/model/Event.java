@@ -41,8 +41,9 @@ public class Event {
     @JoinColumn(name = "organizer_id")
     private User organizer;
 
-
     @ManyToMany
     private List<User> participants;
+
+    private boolean finised;
 }
 

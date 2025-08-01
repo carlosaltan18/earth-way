@@ -28,6 +28,7 @@ public class Organization {
 
     @NotBlank(message = "Contact phone is required")
     private String contactPhone;
+    private String logo;
 
     @OneToOne(optional = true)
     @JoinColumn(name = "creator_id", unique = true)

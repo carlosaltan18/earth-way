@@ -34,7 +34,7 @@ public class AuthService implements IAuthServices {
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
         user.setPhone(registerUserDto.getPhone());
         List<Role> roles = new ArrayList<>();
-        roles.add(roleService.findRoleById(Long.valueOf(2)));
+        roles.add(roleService.findRoleById(Long.valueOf(1)));
         user.setRoles(roles);
 
         return userRepository.save(user);

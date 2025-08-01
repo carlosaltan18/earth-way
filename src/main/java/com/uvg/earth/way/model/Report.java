@@ -35,4 +35,6 @@ public class Report {
     @JoinColumn(name = "author_id")
     private User author;
 
+    private boolean done;
+
 }
