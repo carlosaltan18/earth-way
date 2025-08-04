@@ -103,7 +103,7 @@ public class UserController {
         return ResponseEntity.ok("Password changed");
     }
 
-    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
+    @RolesAllowed({"ADMIN"})
     @PutMapping("/{idUser}")
     public ResponseEntity<Map<String, String>> updateUserId(@PathVariable Long idUser, @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();
@@ -118,7 +118,7 @@ public class UserController {
         }
     }
 
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
     @PutMapping("")
     public ResponseEntity<Map<String, String>> updateUser( @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();
