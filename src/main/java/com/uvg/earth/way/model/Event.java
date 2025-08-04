@@ -28,6 +28,9 @@ public class Event {
     @NotBlank(message = "Event description is required")
     private String description;
 
+    @NotBlank(message = "Event direction is required")
+    private String direction;
+
     @Future(message = "Date must be in the future")
     private LocalDate date;
 
