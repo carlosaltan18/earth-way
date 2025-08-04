@@ -7,13 +7,13 @@ import org.springframework.data.domain.Page;
 import java.util.Optional;
 
 public interface IUserService {
-    User findUserById(Long id);
+    Optional<User> findUserById(Long id);
 
     void saveUser(User user);
 
     void deleteUser(Long id);
 
-    User findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
     void updateUser(UserDto user, Long idUser);
 
