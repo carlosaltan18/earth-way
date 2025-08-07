@@ -30,12 +30,12 @@ public class EventDto {
     @Future(message = "Date must be in the future")
     private LocalDate date;
 
-    private Double latitude;
-    private Double longitude;
+    private Point location;
+
 
     // DTOs for relations
     // private OrganizationDto organization;
-    private UserDto organizer;
+    private Long idOrganizer;
     private List<UserDto> participants;
 
     private boolean finished;

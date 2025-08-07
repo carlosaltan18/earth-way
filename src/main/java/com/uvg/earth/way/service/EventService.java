@@ -5,6 +5,7 @@ import com.uvg.earth.way.dto.EventDto;
 import com.uvg.earth.way.exception.EventDeletionException;
 import com.uvg.earth.way.model.Event;
 import com.uvg.earth.way.repository.EventRepository;
+import com.uvg.earth.way.repository.UserRepository;
 import com.uvg.earth.way.service.interfaces.IEventService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class EventService  implements IEventService {
 
     private EventRepository eventRepository;
-
+    private final UserService userService;
 
     @Override
     public Event findEventById(Long id) {
@@ -37,7 +38,8 @@ public class EventService  implements IEventService {
     @Override
     public void deleteEvent(Long idEvent) {
         if(!eventRepository.existsById(idEvent)){
-            throw new IllegalArgumentException("No se encontro el evento con el id: " + idEvent);
+            throw new IllegalArgumentException("No se en" +
+                    "contro el evento con el id: " + idEvent);
         }
         try{
             eventRepository.deleteById(idEvent);
@@ -51,6 +53,18 @@ public class EventService  implements IEventService {
         validateEventDto(idEvent);
         Optional<Event> eventOptional = eventRepository.findById(idEvent);
         if(eventOptional.isPresent()){
+            Event event = eventOptional.get();
+            if(eventDto.getName() != null) event.setName(eventDto.getName());
+            if(eventDto.getDescription() != null) event.setDescription(eventDto.getDescription());
+            if(eventDto.getDirection()!= null) event.setDirection(eventDto.getDirection());
+            if(eventDto.getDate()!= null) event.setDate(eventDto.getDate());
+            if(eventDto.getLocation() != null) event.setLocation(eventDto.getLocation());
+            if(eventDto.getDate() != null) event.setDate(eventDto.getDate());
+            if(eventDto.getIdOrganizer() != null && eventDto.getIdOrganizer() != null){
+                //User user = userService
+            };
+
+
 
         }
     }
