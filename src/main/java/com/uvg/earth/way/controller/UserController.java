@@ -25,8 +25,11 @@ public class UserController {
     private final UserService userService;
     private final static String MESSAGE = "message";
     private final static String ERROR = "error";
+    private final static String ADMIN = "ADMIN";
+    private final static String USER = "USER";
+    private final static String ORGANIZATION = "ORGANIZATION";
 
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({ADMIN})
     @GetMapping(value = "/")
     public ResponseEntity<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
@@ -50,7 +53,7 @@ public class UserController {
         }
     }
 
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({ADMIN})
     @GetMapping("/{idUser}")
     public ResponseEntity<Map<String, Object>> findUsers(@PathVariable Long idUser) {
         Map<String, Object> response = new HashMap<>();
@@ -72,7 +75,7 @@ public class UserController {
         }
     }
 
-    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @DeleteMapping("/")
     public ResponseEntity<Map<String, Object>> deleteUsers() {
         Map<String, Object> response = new HashMap<>();
@@ -94,7 +97,7 @@ public class UserController {
     }
 
 
-    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto password) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,7 +106,7 @@ public class UserController {
         return ResponseEntity.ok("Password changed");
     }
 
-    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
+    @RolesAllowed({ADMIN})
     @PutMapping("/{idUser}")
     public ResponseEntity<Map<String, String>> updateUserId(@PathVariable Long idUser, @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();
@@ -118,7 +121,7 @@ public class UserController {
         }
     }
 
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @PutMapping("")
     public ResponseEntity<Map<String, String>> updateUser( @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();

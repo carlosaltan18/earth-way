@@ -31,10 +31,14 @@ public class SecurityConfig {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/v3/**").permitAll()
+                        authorizeRequests
+                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/swagger-ui.html").permitAll()
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/swagger-resources/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                .requestMatchers("/v3/**").permitAll()
+                                .requestMatchers("/webjars/**").permitAll()
                                 .requestMatchers("/api/v1/user/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/post/**").permitAll()
