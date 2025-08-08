@@ -22,10 +22,10 @@ public class SecurityConfig {
     private JwtAuthFilter jwtAuthFilter;
     private AuthenticationProvider authenticationProvider;
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     private static final String ADMIN = "ROLE_ADMIN";
     private static final String USER = "ROLE_USER";
     private static final String ORGANIZATION = "ROLE_ORGANIZATION";
-
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -39,20 +39,18 @@ public class SecurityConfig {
                                 .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/v3/**").permitAll()
                                 .requestMatchers("/webjars/**").permitAll()
+                                .requestMatchers("/api/v1/post/**").permitAll()
                                 .requestMatchers("/api/v1/user/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN, ORGANIZATION)
-                                .requestMatchers("/api/v1/post/**").permitAll()
                                 .requestMatchers("/api/v1/report/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/role/**").hasAnyAuthority(ADMIN)
-                                .anyRequest().authenticated())
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                                .anyRequest().authenticated()
                 )
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
 
+        return http.build();
     }
 }

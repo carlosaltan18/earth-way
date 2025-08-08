@@ -30,7 +30,7 @@ public class UserController {
     private final static String ORGANIZATION = "ORGANIZATION";
 
     @RolesAllowed({ADMIN})
-    @GetMapping(value = "/")
+    @GetMapping("/get-user")
     public ResponseEntity<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
                                                            @RequestParam(required = false) String email) {
@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @RolesAllowed({ADMIN})
-    @GetMapping("/{idUser}")
+    @GetMapping("/get-user/{idUser}")
     public ResponseEntity<Map<String, Object>> findUsers(@PathVariable Long idUser) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
-    @DeleteMapping("/")
+    @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteUsers() {
         Map<String, Object> response = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -107,7 +107,7 @@ public class UserController {
     }
 
     @RolesAllowed({ADMIN})
-    @PutMapping("/{idUser}")
+    @PutMapping("/update/{idUser}")
     public ResponseEntity<Map<String, String>> updateUserId(@PathVariable Long idUser, @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();
         try{
@@ -122,7 +122,7 @@ public class UserController {
     }
 
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
-    @PutMapping("")
+    @PutMapping("/update")
     public ResponseEntity<Map<String, String>> updateUser( @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
