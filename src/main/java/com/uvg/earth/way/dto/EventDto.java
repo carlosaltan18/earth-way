@@ -1,25 +1,21 @@
-package com.uvg.earth.way.model;
+package com.uvg.earth.way.dto;
 
-import jakarta.persistence.*;
+import com.uvg.earth.way.model.Organization;
+import com.uvg.earth.way.model.User;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.locationtech.jts.geom.Point;
 
-import java.util.List;
 import java.time.LocalDate;
+import java.util.List;
 
-@Entity
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Table(name = "event")
-public class Event {
+@AllArgsConstructor
+@Getter
+@Setter
+public class EventDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "Event name is required")
@@ -34,19 +30,17 @@ public class Event {
     @Future(message = "Date must be in the future")
     private LocalDate date;
 
-    @Column(columnDefinition = "geography(Point, 4326)")
     private Point location;
 
-    @ManyToOne
-    private Organization organization;
 
-    @ManyToOne
-    @JoinColumn(name = "organizer_id")
-    private User organizer;
-
-    @ManyToMany
-    private List<User> participants;
+    // DTOs for relations
+    // private OrganizationDto organization;
+    private Long idOrganizer;
+    private List<UserDto> participants;
 
     private boolean finished;
 }
+
+
+
 
