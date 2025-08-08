@@ -34,7 +34,7 @@ public class EventDto {
 
 
     // DTOs for relations
-    // private OrganizationDto organization;
+    private  Long idOrganization;
     private Long idOrganizer;
     private List<UserDto> participants;
 
