@@ -2,6 +2,7 @@ package com.uvg.earth.way.service;
 
 import com.uvg.earth.way.dto.EventDto;
 import com.uvg.earth.way.dto.UserDto;
+import com.uvg.earth.way.dto.UserEventDto;
 import com.uvg.earth.way.exception.EventDeletionException;
 import com.uvg.earth.way.model.Event;
 import com.uvg.earth.way.model.Organization;
@@ -159,7 +160,7 @@ public class EventService implements IEventService {
         if (eventDto.getParticipants() != null && !eventDto.getParticipants().isEmpty()) {
             List<User> participants = new ArrayList<>();
 
-            for (UserDto userDto : eventDto.getParticipants()) {
+            for (UserEventDto userDto : eventDto.getParticipants()) {
                 if (userDto.getId() != null) {
                     User participant = userService.findById(userDto.getId())
                             .orElseThrow(() -> new EntityNotFoundException("Participante no encontrado con id: " + userDto.getId()));
@@ -278,7 +279,7 @@ public class EventService implements IEventService {
         if (eventDto.getParticipants() != null && !eventDto.getParticipants().isEmpty()) {
             List<User> participants = new ArrayList<>();
 
-            for (UserDto userDto : eventDto.getParticipants()) {
+            for (UserEventDto userDto : eventDto.getParticipants()) {
                 if (userDto.getId() != null) {
                     User participant = userService.findById(userDto.getId())
                             .orElseThrow(() -> new EntityNotFoundException("Participante no encontrado con id: " + userDto.getId()));
@@ -368,7 +369,7 @@ public class EventService implements IEventService {
 
         // Convert participants to UserDto list
         if (event.getParticipants() != null && !event.getParticipants().isEmpty()) {
-            List<UserDto> participantDtos = event.getParticipants().stream()
+            List<UserEventDto> participantDtos = event.getParticipants().stream()
                     .map(this::convertUserToDto)
                     .collect(Collectors.toList());
             dto.setParticipants(participantDtos);
@@ -382,8 +383,8 @@ public class EventService implements IEventService {
      * @param user
      * @return UserDto
      */
-    private UserDto convertUserToDto(User user) {
-        UserDto userDto = new UserDto();
+    private UserEventDto convertUserToDto(User user) {
+        UserEventDto userDto = new UserEventDto();
         userDto.setId(user.getId());
         userDto.setName(user.getName());
         userDto.setEmail(user.getEmail());

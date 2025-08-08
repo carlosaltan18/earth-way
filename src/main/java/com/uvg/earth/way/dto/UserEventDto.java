@@ -6,7 +6,8 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserDto {
+public class UserEventDto {
+    private Long id;
     private String name;
     private String surname;
     private String email;
