@@ -37,8 +37,8 @@ public class Event {
     @Column(columnDefinition = "geography(Point, 4326)")
     private Point location;
 
-    /* @ManyToOne
-    private Organization organization;*/
+    @ManyToOne
+    private Organization organization;
 
     @ManyToOne
     @JoinColumn(name = "organizer_id")
