@@ -25,9 +25,12 @@ public class UserController {
     private final UserService userService;
     private final static String MESSAGE = "message";
     private final static String ERROR = "error";
+    private final static String ADMIN = "ADMIN";
+    private final static String USER = "USER";
+    private final static String ORGANIZATION = "ORGANIZATION";
 
-    @RolesAllowed({"ADMIN"})
-    @GetMapping(value = "/")
+    @RolesAllowed({ADMIN})
+    @GetMapping("/get-user")
     public ResponseEntity<Map<String, Object>> getAllUsers(@RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
                                                            @RequestParam(required = false) String email) {
@@ -50,8 +53,8 @@ public class UserController {
         }
     }
 
-    @RolesAllowed("ADMIN")
-    @GetMapping("/{idUser}")
+    @RolesAllowed({ADMIN})
+    @GetMapping("/get-user/{idUser}")
     public ResponseEntity<Map<String, Object>> findUsers(@PathVariable Long idUser) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -72,8 +75,8 @@ public class UserController {
         }
     }
 
-    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
-    @DeleteMapping("/")
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
+    @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteUsers() {
         Map<String, Object> response = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -94,7 +97,7 @@ public class UserController {
     }
 
 
-    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto password) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,8 +106,8 @@ public class UserController {
         return ResponseEntity.ok("Password changed");
     }
 
-    @RolesAllowed({"ADMIN", "USER", "ORGANIZATION"})
-    @PutMapping("/{idUser}")
+    @RolesAllowed({ADMIN})
+    @PutMapping("/update/{idUser}")
     public ResponseEntity<Map<String, String>> updateUserId(@PathVariable Long idUser, @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();
         try{
@@ -118,8 +121,8 @@ public class UserController {
         }
     }
 
-    @RolesAllowed("ADMIN")
-    @PutMapping("")
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
+    @PutMapping("/update")
     public ResponseEntity<Map<String, String>> updateUser( @RequestBody UserDto userDto) {
         Map<String, String> response = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

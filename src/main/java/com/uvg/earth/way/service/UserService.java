@@ -30,8 +30,11 @@ public class UserService implements IUserService {
     private static final String DONT_EXIST = "Don't exist";
 
     @Override
-    public User findUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public Optional<User> findUserById(Long id) {
+         if (id == null) {
+            throw new IllegalArgumentException("Id is necessary");
+        }
+        return userRepository.findById(id);
     }
 
     @Override
@@ -64,8 +67,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElse(null);
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+      
     }
 
     @Override
