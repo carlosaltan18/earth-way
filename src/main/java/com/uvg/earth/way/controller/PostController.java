@@ -2,6 +2,8 @@ package com.uvg.earth.way.controller;
 
 import com.uvg.earth.way.model.Post;
 import com.uvg.earth.way.service.PostService;
+import com.uvg.earth.way.service.UserService;
+import com.uvg.earth.way.dto.PostDto;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +18,17 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final UserService userService;
     private final static String ADMIN = "ADMIN";
     private final static String USER = "USER";
 
 
     @RolesAllowed({USER})
     @PostMapping("/post-post")
-    public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        return ResponseEntity.ok(postService.createPost(post));
+    public ResponseEntity<PostDto> createPost(@RequestBody Post post) {
+        Post createdPost = postService.createPost(post);
+        PostDto postDto = new PostDto(createdPost, userService);
+        return ResponseEntity.ok(postDto);
     }
     @RolesAllowed({USER})
     @PutMapping("/put-post/{id}")
