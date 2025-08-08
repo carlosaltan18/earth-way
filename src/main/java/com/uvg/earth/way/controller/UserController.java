@@ -34,7 +34,7 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
         try {
 
-            Page<User> userPage = userService.getAllUsers(page, size, email);
+            Page<User> userPage = userService.  getAllUsers(page, size, email);
             response.put("payload", userPage.getContent());
             response.put(MESSAGE, "Users retrieved successfully");
 
