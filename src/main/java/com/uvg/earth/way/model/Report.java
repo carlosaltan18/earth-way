@@ -28,8 +28,9 @@ public class Report {
 
     private LocalDate date;
 
-    @Column(columnDefinition = "geometry(Point, 4326)")
-    private Point location;
+    // TODO: Implementar el dato de tipo Point
+    /*@Column(columnDefinition = "geometry(Point, 4326)")
+    private Point location;*/
 
     @ManyToOne
     @JoinColumn(name = "author_id")
