@@ -1,6 +1,7 @@
 package com.uvg.earth.way.service;
 
 import com.uvg.earth.way.dto.EventDto;
+import com.uvg.earth.way.dto.OrganizationResponseDto;
 import com.uvg.earth.way.dto.UserDto;
 import com.uvg.earth.way.dto.UserEventDto;
 import com.uvg.earth.way.exception.EventDeletionException;
@@ -29,7 +30,7 @@ public class EventService implements IEventService {
 
     private EventRepository eventRepository;
     private final UserService userService;
-    //private final OrganizationService organizationService;
+    private final OrganizationService organizationService;
 
     /**
      * Finds an event by ID
@@ -269,11 +270,14 @@ public class EventService implements IEventService {
         }
 
         // Assign organization if provided
-       /* if (eventDto.getIdOrganization() != null) {
-            Organization organization = organizationService.findById(eventDto.getIdOrganization())
-                    .orElseThrow(() -> new EntityNotFoundException("Organización no encontrada con id: " + eventDto.getIdOrganization()));
+        if (eventDto.getIdOrganization() != null) {
+            Organization organization = organizationService.findEntityById(eventDto.getIdOrganization())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Organización no encontrada con id: " + eventDto.getIdOrganization()
+                    ));
+
             event.setOrganization(organization);
-        }*/
+        }
 
         // Assign participants if provided
         if (eventDto.getParticipants() != null && !eventDto.getParticipants().isEmpty()) {
