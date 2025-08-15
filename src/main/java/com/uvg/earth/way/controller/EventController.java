@@ -3,6 +3,7 @@ package com.uvg.earth.way.controller;
 import com.uvg.earth.way.dto.EventDto;
 import com.uvg.earth.way.model.Event;
 import com.uvg.earth.way.model.User;
+import com.uvg.earth.way.security.SecurityConfig;
 import com.uvg.earth.way.service.EventService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
@@ -63,26 +64,28 @@ public class EventController {
         try{
             Optional<Event> event = eventService.findById(idEvent);
             if(event.isPresent()){
-                response.put(MESSAGE, "event");
-                return ResponseEntity.notFound().build();
-
+                // CORREGIDO: Cuando existe, devolver OK con el evento
+                response.put(PAYLOAD, eventService.convertToDto(event.get()));
+                response.put(MESSAGE, "Event found successfully");
+                return ResponseEntity.ok(response);
             }else {
+                // CORREGIDO: Cuando no existe, devolver not found
+                response.put(MESSAGE, "Event not found");
                 return ResponseEntity.notFound().build();
-
             }
         }catch(IllegalArgumentException e){
             response.put(MESSAGE, e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }catch(Exception e){
             response.put(MESSAGE, ERROR);
-            response.put("err", "There is an error getting event" + e.getMessage());
+            response.put("err", "There is an error getting event: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }
 
 
-    @RolesAllowed({ADMIN, USER, ORGANIZATION})
-    @PostMapping("")
+    @RolesAllowed({ADMIN})
+    @PostMapping(value="/create")
     public ResponseEntity<Map<String,Object>> createEvent(@RequestBody EventDto eventDto){
         Map<String, Object> response = new HashMap<>();
         try{
@@ -144,6 +147,7 @@ public class EventController {
 
     //          SPECIFIC RESEARCH METHODS
 
+    /**
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @PostMapping("/{eventId}/participants/{userId}")
     public ResponseEntity<Map<String, Object>> addParticipant(
@@ -166,7 +170,9 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+     **/
 
+    /**
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @DeleteMapping("/{eventId}/participants/{userId}")
     public ResponseEntity<Map<String, Object>> removeParticipant(
@@ -189,7 +195,10 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+     **/
 
+
+    /**
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{eventId}/participants")
     public ResponseEntity<Map<String, Object>> getEventParticipants(@PathVariable Long eventId) {
@@ -207,7 +216,9 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+     **/
 
+    /**
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{eventId}/participants/{userId}/check")
     public ResponseEntity<Map<String, Object>> isUserParticipant(
@@ -227,7 +238,9 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+    /**
 
+     /**
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{eventId}/participants/count")
     public ResponseEntity<Map<String, Object>> getParticipantCount(@PathVariable Long eventId) {
@@ -244,6 +257,8 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+
+    **/
 
 
 

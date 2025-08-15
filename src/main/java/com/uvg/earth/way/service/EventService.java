@@ -19,6 +19,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +37,7 @@ public class EventService implements IEventService {
     private EventRepository eventRepository;
     private final UserService userService;
     private final OrganizationService organizationService;
-
+    private final GeometryFactory geometryFactory;
     /**
      * Finds an event by ID
      * @param id
@@ -93,10 +99,15 @@ public class EventService implements IEventService {
             if (eventDto.getDate() != null) {
                 event.setDate(eventDto.getDate());
             }
-            if (eventDto.getLocation() != null) {
-                event.setLocation(eventDto.getLocation());
+            /**
+            if (eventDto.getLatitude() != null && eventDto.getLongitude() != null) {
+                Point point = geometryFactory.createPoint(
+                        new Coordinate(eventDto.getLongitude(), eventDto.getLatitude())
+                );
+                point.setSRID(4326);
+                event.setLocation(point);
             }
-
+                **/
             event.setFinished(eventDto.isFinished());
 
             // Update organizer
@@ -106,7 +117,7 @@ public class EventService implements IEventService {
            // updateOrganization(eventDto, event);
 
             // Update participants if provided
-            updateParticipants(eventDto, event);
+            //updateParticipants(eventDto, event);
 
             eventRepository.save(event);
         } else {
@@ -157,6 +168,7 @@ public class EventService implements IEventService {
      * @param eventDto
      * @param event
      */
+    /**
     public void updateParticipants(EventDto eventDto, Event event) {
         if (eventDto.getParticipants() != null && !eventDto.getParticipants().isEmpty()) {
             List<User> participants = new ArrayList<>();
@@ -172,7 +184,7 @@ public class EventService implements IEventService {
             event.setParticipants(participants);
         }
     }
-
+    */
     /**
      * Finds an event by ID (returns Optional)
      * @param idEvent
@@ -259,8 +271,17 @@ public class EventService implements IEventService {
         event.setDescription(eventDto.getDescription());
         event.setDirection(eventDto.getDirection());
         event.setDate(eventDto.getDate());
-        event.setLocation(eventDto.getLocation());
+
+        if (eventDto.getLatitude() != null && eventDto.getLongitude() != null) {
+            Point point = geometryFactory.createPoint(
+                    new Coordinate(eventDto.getLongitude(), eventDto.getLatitude())
+            );
+            point.setSRID(4326);
+            event.setLocation(point);
+        }
+
         event.setFinished(eventDto.isFinished());
+        event.setFinised(eventDto.isFinised());
 
         // Assign organizer if provided
         if (eventDto.getIdOrganizer() != null) {
@@ -280,6 +301,7 @@ public class EventService implements IEventService {
         }
 
         // Assign participants if provided
+
         if (eventDto.getParticipants() != null && !eventDto.getParticipants().isEmpty()) {
             List<User> participants = new ArrayList<>();
 
@@ -312,9 +334,15 @@ public class EventService implements IEventService {
         event.setDescription(eventDto.getDescription());
         event.setDirection(eventDto.getDirection());
         event.setDate(eventDto.getDate());
-        event.setLocation(eventDto.getLocation());
-        event.setFinished(eventDto.isFinished());
-
+        /**
+        if (eventDto.getLatitude() != null && eventDto.getLongitude() != null) {
+            Point point = geometryFactory.createPoint(
+                    new Coordinate(eventDto.getLongitude(), eventDto.getLatitude())
+            );
+            point.setSRID(4326);
+            event.setLocation(point);
+        }        event.setFinished(eventDto.isFinished());
+        **/
         // Assign organizer if provided
         if (eventDto.getIdOrganizer() != null) {
             User organizer = userService.findById(eventDto.getIdOrganizer())
@@ -330,6 +358,7 @@ public class EventService implements IEventService {
         }*/
 
         // Assign participants if provided
+        /**
         if (participantIds != null && !participantIds.isEmpty()) {
             List<User> participants = new ArrayList<>();
 
@@ -340,7 +369,7 @@ public class EventService implements IEventService {
             }
 
             event.setParticipants(participants);
-        }
+        }**/
 
         return eventRepository.save(event);
     }
@@ -353,14 +382,16 @@ public class EventService implements IEventService {
     public EventDto convertToDto(Event event) {
         EventDto dto = new EventDto();
 
-        dto.setId(event.getId());
         dto.setName(event.getName());
         dto.setDescription(event.getDescription());
         dto.setDirection(event.getDirection());
         dto.setDate(event.getDate());
-        dto.setLocation(event.getLocation());
-        dto.setFinished(event.isFinished());
-
+       /**
+        if (event.getLocation() != null) {
+            dto.setLatitude(event.getLocation().getY()); // Latitud
+            dto.setLongitude(event.getLocation().getX()); // Longitud
+        }        dto.setFinished(event.isFinished());
+        **/
         // Set organizer if exists
         if (event.getOrganizer() != null) {
             dto.setIdOrganizer(event.getOrganizer().getId());
@@ -372,12 +403,13 @@ public class EventService implements IEventService {
         }
 
         // Convert participants to UserDto list
+        /**
         if (event.getParticipants() != null && !event.getParticipants().isEmpty()) {
             List<UserEventDto> participantDtos = event.getParticipants().stream()
                     .map(this::convertUserToDto)
                     .collect(Collectors.toList());
             dto.setParticipants(participantDtos);
-        }
+        }**/
 
         return dto;
     }
@@ -403,6 +435,8 @@ public class EventService implements IEventService {
      * @param eventId
      * @param userId
      */
+
+    /**
     public void addParticipant(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
@@ -421,13 +455,15 @@ public class EventService implements IEventService {
         } else {
             throw new IllegalArgumentException("El usuario ya es participante del evento");
         }
-    }
+    }**/
 
     /**
      * Remove a participant from an event
      * @param eventId
      * @param userId
      */
+
+    /**
     public void removeParticipant(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
@@ -441,25 +477,28 @@ public class EventService implements IEventService {
         } else {
             throw new IllegalArgumentException("El usuario no es participante del evento");
         }
-    }
+    }**/
 
     /**
      * Get all participants of an event
      * @param eventId
      * @return List of participants
      */
+    /**
     public List<User> getEventParticipants(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
 
         return event.getParticipants() != null ? event.getParticipants() : new ArrayList<>();
-    }
+    }**/
 
     /**
      * Get events where a user is a participant
      * @param userId
      * @return List of events
      */
+
+    /**
     public List<Event> getEventsByParticipant(Long userId) {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + userId));
@@ -467,7 +506,7 @@ public class EventService implements IEventService {
         return eventRepository.findAll().stream()
                 .filter(event -> event.getParticipants() != null && event.getParticipants().contains(user))
                 .collect(Collectors.toList());
-    }
+    }**/
 
     /**
      * Check if a user is a participant in an event
@@ -475,6 +514,7 @@ public class EventService implements IEventService {
      * @param userId
      * @return boolean
      */
+    /**
     public boolean isUserParticipant(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
@@ -483,19 +523,21 @@ public class EventService implements IEventService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + userId));
 
         return event.getParticipants() != null && event.getParticipants().contains(user);
-    }
+    }**/
 
     /**
      * Get participant count for an event
      * @param eventId
      * @return int
      */
+
+    /**
     public int getParticipantCount(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
 
         return event.getParticipants() != null ? event.getParticipants().size() : 0;
-    }
+    }**/
 
 
 }
