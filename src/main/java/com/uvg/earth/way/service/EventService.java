@@ -161,7 +161,7 @@ public class EventService implements IEventService {
             List<User> participants = new ArrayList<>();
 
             for (UserEventDto userDto : eventDto.getParticipants()) {
-                if (userDto.getId() != null) {
+                if (userDto.getId() != 0) {
                     User participant = userService.findById(userDto.getId())
                             .orElseThrow(() -> new EntityNotFoundException("Participante no encontrado con id: " + userDto.getId()));
                     participants.add(participant);
@@ -280,7 +280,7 @@ public class EventService implements IEventService {
             List<User> participants = new ArrayList<>();
 
             for (UserEventDto userDto : eventDto.getParticipants()) {
-                if (userDto.getId() != null) {
+                if (userDto.getId() != 0) {
                     User participant = userService.findById(userDto.getId())
                             .orElseThrow(() -> new EntityNotFoundException("Participante no encontrado con id: " + userDto.getId()));
                     participants.add(participant);
