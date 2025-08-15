@@ -32,14 +32,12 @@ public class EventDto {
     private Double latitude;
     private Double longitude;
 
-
     // DTOs for relations
-    private  Long idOrganization;
+    private Long idOrganization;
     private Long idOrganizer;
     private List<UserEventDto> participants;
 
     private boolean finished;
-    private boolean finised;
 }
 
 

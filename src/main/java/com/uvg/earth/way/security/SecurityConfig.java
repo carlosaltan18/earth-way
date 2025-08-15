@@ -46,15 +46,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN)
                                 .requestMatchers("/api/v1/report/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/role/**").hasAnyAuthority(ADMIN)
-
-                                .requestMatchers(HttpMethod.POST, "/api/v1/event/create").hasAnyAuthority(ADMIN)
-                                .requestMatchers(HttpMethod.POST, "/api/v1/event/*/participants/*").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/event/*/participants/*").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/event/*/participants/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/event/").hasAnyAuthority(ADMIN)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/event/*").hasAnyAuthority(ADMIN)
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/event/*").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/event/*").hasAnyAuthority(ADMIN)
 
                                 .anyRequest().authenticated()
                 )

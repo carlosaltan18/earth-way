@@ -52,7 +52,5 @@ public class Event {
     @Column(name = "finished", nullable = false)
     private boolean finished;
 
-    @Column(name = "finised", nullable = false)
-    private boolean finised;
 }
 

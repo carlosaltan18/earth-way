@@ -281,7 +281,6 @@ public class EventService implements IEventService {
         }
 
         event.setFinished(eventDto.isFinished());
-        event.setFinised(eventDto.isFinised());
 
         // Assign organizer if provided
         if (eventDto.getIdOrganizer() != null) {
