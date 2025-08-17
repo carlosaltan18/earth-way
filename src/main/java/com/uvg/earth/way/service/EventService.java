@@ -80,12 +80,12 @@ public class EventService implements IEventService {
      */
     @Override
     public void updateEvent(EventDto eventDto, Long idEvent) {
-        validateEventDto(idEvent);
         Optional<Event> eventOptional = eventRepository.findById(idEvent);
 
         if (eventOptional.isPresent()) {
             Event event = eventOptional.get();
 
+            System.out.println(event);
             // Updating basic fields
             if (eventDto.getName() != null && !eventDto.getName().trim().isEmpty()) {
                 event.setName(eventDto.getName());
@@ -99,7 +99,7 @@ public class EventService implements IEventService {
             if (eventDto.getDate() != null) {
                 event.setDate(eventDto.getDate());
             }
-            /**
+
             if (eventDto.getLatitude() != null && eventDto.getLongitude() != null) {
                 Point point = geometryFactory.createPoint(
                         new Coordinate(eventDto.getLongitude(), eventDto.getLatitude())
@@ -107,14 +107,14 @@ public class EventService implements IEventService {
                 point.setSRID(4326);
                 event.setLocation(point);
             }
-                **/
+
             event.setFinished(eventDto.isFinished());
 
             // Update organizer
             addingOrganizer(eventDto, event);
 
             // Update organization if provided
-           // updateOrganization(eventDto, event);
+           updateOrganization(eventDto, event);
 
             // Update participants if provided
             //updateParticipants(eventDto, event);
@@ -125,15 +125,6 @@ public class EventService implements IEventService {
         }
     }
 
-    /**
-     * Validates if an event exists
-     * @param idEvent
-     */
-    public void validateEventDto(Long idEvent) {
-        if (!eventRepository.existsById(idEvent)) {
-            throw new EntityNotFoundException("Evento " + idEvent + " no existe");
-        }
-    }
 
     /**
      * Adds or updates organizer for an event
@@ -154,14 +145,14 @@ public class EventService implements IEventService {
      * @param eventDto
      * @param event
      */
-   /* public void updateOrganization(EventDto eventDto, Event event) {
+    public void updateOrganization(EventDto eventDto, Event event) {
         if (eventDto.getIdOrganization() != null) {
-            Organization organization = organizationService.findById(eventDto.getIdOrganization())
+            Organization organization = organizationService.findEntityById(eventDto.getIdOrganization())
                     .orElseThrow(() -> new EntityNotFoundException("Organización no encontrada."));
 
             event.setOrganization(organization);
         }
-    }*/
+    }
 
     /**
      * Updates participants for an event
@@ -385,12 +376,12 @@ public class EventService implements IEventService {
         dto.setDescription(event.getDescription());
         dto.setDirection(event.getDirection());
         dto.setDate(event.getDate());
-       /**
+
         if (event.getLocation() != null) {
             dto.setLatitude(event.getLocation().getY()); // Latitud
             dto.setLongitude(event.getLocation().getX()); // Longitud
         }        dto.setFinished(event.isFinished());
-        **/
+
         // Set organizer if exists
         if (event.getOrganizer() != null) {
             dto.setIdOrganizer(event.getOrganizer().getId());
