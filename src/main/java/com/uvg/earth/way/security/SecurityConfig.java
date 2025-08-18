@@ -43,7 +43,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/post/listPost").permitAll()
                                 .requestMatchers("/api/v1/post/**").hasAnyAuthority(USER, ADMIN)
                                 .requestMatchers("/api/v1/user/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
-                                .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN)
+                                .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/report/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/role/**").hasAnyAuthority(ADMIN)
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/event/*").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
