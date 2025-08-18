@@ -66,12 +66,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
+            System.out.println("catch 1");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expirado.");
             return;
         } catch (MalformedJwtException | SignatureException e) {
+            System.out.println("catch 2");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token inválido.");
             return;
         } catch (Exception e) {
+            System.out.println("catch 3");
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error de autenticación.");
             return;
         }

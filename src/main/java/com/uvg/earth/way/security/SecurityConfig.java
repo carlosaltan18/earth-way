@@ -3,6 +3,7 @@ package com.uvg.earth.way.security;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,6 +46,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/report/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/role/**").hasAnyAuthority(ADMIN)
+                                .requestMatchers(HttpMethod.PUT, "/api/v1/event/*").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
+
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
