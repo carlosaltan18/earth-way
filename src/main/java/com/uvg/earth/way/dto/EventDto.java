@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 public class EventDto {
+    private Long id;
 
     @NotBlank(message = "Event name is required")
     private String name;
