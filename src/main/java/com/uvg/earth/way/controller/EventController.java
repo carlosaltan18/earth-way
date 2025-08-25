@@ -3,6 +3,7 @@ package com.uvg.earth.way.controller;
 import com.uvg.earth.way.dto.EventDto;
 import com.uvg.earth.way.model.Event;
 import com.uvg.earth.way.model.User;
+import com.uvg.earth.way.security.SecurityConfig;
 import com.uvg.earth.way.service.EventService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,7 +33,7 @@ public class EventController {
     private final static String USER = "USER";
     private final static String ORGANIZATION = "ORGANIZATION";
 
-    @RolesAllowed({ADMIN})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping(value = "/")
     public ResponseEntity<Map<String, Object>> getAllEvents(@RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size,
@@ -38,7 +41,7 @@ public class EventController {
         Map<String, Object> response = new HashMap<>();
 
         try{
-            Page<Event> eventPage = eventService.getAllEvents(page, size, email);
+            Page<EventDto> eventPage = eventService.getAllEvents(page, size, email);
             response.put("payload", eventPage.getContent());
             response.put(MESSAGE, "Events retrieved successfully");
 
@@ -56,33 +59,35 @@ public class EventController {
         }
     }
 
-    @RolesAllowed({ADMIN})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{idEvent}")
     public ResponseEntity<Map<String, Object>> findEvent(@PathVariable Long idEvent) {
         Map<String, Object> response = new HashMap<>();
         try{
             Optional<Event> event = eventService.findById(idEvent);
             if(event.isPresent()){
-                response.put(MESSAGE, "event");
-                return ResponseEntity.notFound().build();
-
+                // CORREGIDO: Cuando existe, devolver OK con el evento
+                response.put(PAYLOAD, eventService.convertToDto(event.get()));
+                response.put(MESSAGE, "Event found successfully");
+                return ResponseEntity.ok(response);
             }else {
+                // CORREGIDO: Cuando no existe, devolver not found
+                response.put(MESSAGE, "Event not found");
                 return ResponseEntity.notFound().build();
-
             }
         }catch(IllegalArgumentException e){
             response.put(MESSAGE, e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }catch(Exception e){
             response.put(MESSAGE, ERROR);
-            response.put("err", "There is an error getting event" + e.getMessage());
+            response.put("err", "There is an error getting event: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }
 
 
-    @RolesAllowed({ADMIN, USER, ORGANIZATION})
-    @PostMapping("")
+    @RolesAllowed({ADMIN})
+    @PostMapping(value="/create")
     public ResponseEntity<Map<String,Object>> createEvent(@RequestBody EventDto eventDto){
         Map<String, Object> response = new HashMap<>();
         try{
@@ -144,16 +149,17 @@ public class EventController {
 
     //          SPECIFIC RESEARCH METHODS
 
-    @RolesAllowed({ADMIN, USER, ORGANIZATION})
-    @PostMapping("/{eventId}/participants/{userId}")
+
+    @RolesAllowed({USER})
+    @PostMapping("/{eventId}/participants")
     public ResponseEntity<Map<String, Object>> addParticipant(
-            @PathVariable Long eventId,
-            @PathVariable Long userId) {
+            @PathVariable Long eventId) {
 
         Map<String, Object> response = new HashMap<>();
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User customUserDetails = (User) authentication.getPrincipal();
         try {
-            eventService.addParticipant(eventId, userId);
+            eventService.addParticipant(eventId, customUserDetails.getId());
             response.put(MESSAGE, "Participant added successfully");
             response.put("participantCount", eventService.getParticipantCount(eventId));
             return ResponseEntity.ok(response);
@@ -167,16 +173,18 @@ public class EventController {
         }
     }
 
-    @RolesAllowed({ADMIN, USER, ORGANIZATION})
-    @DeleteMapping("/{eventId}/participants/{userId}")
+
+
+    @RolesAllowed({USER})
+    @DeleteMapping("/{eventId}/participants")
     public ResponseEntity<Map<String, Object>> removeParticipant(
-            @PathVariable Long eventId,
-            @PathVariable Long userId) {
+            @PathVariable Long eventId) {
 
         Map<String, Object> response = new HashMap<>();
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User customUserDetails = (User) authentication.getPrincipal();
         try {
-            eventService.removeParticipant(eventId, userId);
+            eventService.removeParticipant(eventId, customUserDetails.getId());
             response.put(MESSAGE, "Participant removed successfully");
             response.put("participantCount", eventService.getParticipantCount(eventId));
             return ResponseEntity.ok(response);
@@ -189,6 +197,9 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+
+
+
 
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{eventId}/participants")
@@ -208,6 +219,8 @@ public class EventController {
         }
     }
 
+
+/**
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{eventId}/participants/{userId}/check")
     public ResponseEntity<Map<String, Object>> isUserParticipant(
@@ -227,6 +240,8 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+    **/
+
 
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{eventId}/participants/count")
@@ -244,6 +259,8 @@ public class EventController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+
+
 
 
 

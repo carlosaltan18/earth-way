@@ -3,7 +3,9 @@ package com.uvg.earth.way.controller;
 import com.uvg.earth.way.dto.OrganizationRequestDto;
 import com.uvg.earth.way.dto.OrganizationResponseDto;
 import com.uvg.earth.way.service.OrganizationService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,22 +19,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RestController
+@AllArgsConstructor
 @RequestMapping(value = "/api/v1/organization")
-@RequiredArgsConstructor
-@CrossOrigin
+@RestController
 public class OrganizationController {
     private final OrganizationService organizationService;
 
     private static final String MESSAGE = "message";
     private static final String ERROR = "error";
-
+    private final static String ADMIN = "ADMIN";
+    private final static String USER = "USER";
     /**
      * Obtener todas las organizaciones con paginación
      * GET /api/v1/organization?page=0&size=10
      */
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "")
+    @RolesAllowed({ADMIN})
+    @GetMapping("")
     public ResponseEntity<Map<String, Object>> getAllOrganizations(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -62,8 +64,8 @@ public class OrganizationController {
      * Obtener organización por ID
      * GET /api/v1/organization/{id}
      */
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "/{id}")
+    @RolesAllowed({ADMIN})
+    @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getOrganizationById(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -90,8 +92,8 @@ public class OrganizationController {
      * Crear nueva organización
      * POST /api/v1/organization
      */
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(value = "")
+    @RolesAllowed({ADMIN})
+    @PostMapping( "")
     public ResponseEntity<Map<String, Object>> createOrganization(
             @Valid @RequestBody OrganizationRequestDto requestDto,
             @RequestParam Long creatorId) {
@@ -121,8 +123,8 @@ public class OrganizationController {
      * Actualizar organización existente
      * PUT /api/v1/organization/{id}
      */
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(value = "/{id}")
+    @RolesAllowed({ADMIN})
+    @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateOrganization(
             @PathVariable Long id,
             @Valid @RequestBody OrganizationRequestDto requestDto) {
@@ -152,8 +154,8 @@ public class OrganizationController {
      * Eliminar organización
      * DELETE /api/v1/organization/{id}
      */
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(value = "/{id}")
+    @RolesAllowed({ADMIN})
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteOrganization(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -178,8 +180,8 @@ public class OrganizationController {
      * Buscar organización por nombre
      * GET /api/v1/organization/search?name=nombreOrganizacion
      */
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "/search")
+    @RolesAllowed({ADMIN})
+    @GetMapping("/search")
     public ResponseEntity<Map<String, Object>> getOrganizationByName(
             @RequestParam String name) {
 

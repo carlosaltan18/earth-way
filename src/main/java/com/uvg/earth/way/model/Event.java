@@ -34,6 +34,7 @@ public class Event {
     @Future(message = "Date must be in the future")
     private LocalDate date;
 
+
     @Column(columnDefinition = "geography(Point, 4326)")
     private Point location;
 
@@ -44,9 +45,12 @@ public class Event {
     @JoinColumn(name = "organizer_id")
     private User organizer;
 
+
     @ManyToMany
     private List<User> participants;
 
+    @Column(name = "finished", nullable = false)
     private boolean finished;
+
 }
 

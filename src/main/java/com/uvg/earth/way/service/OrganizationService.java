@@ -35,6 +35,11 @@ public class OrganizationService {
                 .map(this::convertToResponseDto);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Organization> findEntityById(Long id) {
+        return organizationRepository.findById(id);
+    }
+
     /**
      * Crear nueva organización
      */

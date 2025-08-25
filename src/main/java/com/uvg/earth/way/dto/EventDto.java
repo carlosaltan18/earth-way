@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 @Setter
 public class EventDto {
-
     private Long id;
 
     @NotBlank(message = "Event name is required")
@@ -30,11 +29,12 @@ public class EventDto {
     @Future(message = "Date must be in the future")
     private LocalDate date;
 
-    private Point location;
 
+    private Double latitude;
+    private Double longitude;
 
     // DTOs for relations
-    private  Long idOrganization;
+    private Long idOrganization;
     private Long idOrganizer;
     private List<UserEventDto> participants;
 
