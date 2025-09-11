@@ -95,16 +95,15 @@ public class OrganizationController {
     @RolesAllowed({ADMIN})
     @PostMapping( "")
     public ResponseEntity<Map<String, Object>> createOrganization(
-            @Valid @RequestBody OrganizationRequestDto requestDto,
-            @RequestParam Long creatorId) {
+            @Valid @RequestBody OrganizationRequestDto requestDto) {
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            OrganizationResponseDto createdOrganization = organizationService.createOrganization(requestDto, creatorId);
+            OrganizationResponseDto createdOrganization = organizationService.createOrganization(requestDto);
 
             response.put("payload", createdOrganization);
-            response.put(MESSAGE, "Organization created successfully");
+            response.put(MESSAGE, "Organización creada con éxito");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
