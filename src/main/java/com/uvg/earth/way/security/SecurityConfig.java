@@ -1,5 +1,6 @@
 package com.uvg.earth.way.security;
 
+import com.uvg.earth.way.configuration.JwtAccessDeniedHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ public class SecurityConfig {
     private JwtAuthFilter jwtAuthFilter;
     private AuthenticationProvider authenticationProvider;
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     private static final String ADMIN = "ROLE_ADMIN";
     private static final String USER = "ROLE_USER";
@@ -53,7 +55,10 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
 
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)  // 401 → sin autenticación
+                .accessDeniedHandler(jwtAccessDeniedHandler)            // 403 → sin permisos
+        )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
