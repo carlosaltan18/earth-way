@@ -1,5 +1,6 @@
 package com.uvg.earth.way.controller;
 
+import com.uvg.earth.way.dto.ReportRequestDto;
 import com.uvg.earth.way.dto.ReportResponseDto;
 import com.uvg.earth.way.model.Report;
 import com.uvg.earth.way.service.ReportService;
@@ -19,7 +20,7 @@ public class ReportController {
 
     @RolesAllowed("USER")
     @PostMapping
-    public ResponseEntity<ReportResponseDto> createReport(@RequestBody Report report) {
+    public ResponseEntity<ReportResponseDto> createReport(@RequestBody ReportRequestDto report) {
         ReportResponseDto newReport = reportService.createReport(report);
         return new ResponseEntity<>(newReport, HttpStatus.CREATED);
     }
@@ -44,7 +45,7 @@ public class ReportController {
     @PutMapping("/{id}")
     public ResponseEntity<ReportResponseDto> updateReport(
             @PathVariable Long id,
-            @RequestBody Report report
+            @RequestBody ReportRequestDto report
     ) {
         ReportResponseDto updatedReport = reportService.updateReport(id, report);
         return new ResponseEntity<>(updatedReport, HttpStatus.OK);

@@ -1,5 +1,6 @@
 package com.uvg.earth.way.service;
 
+import com.uvg.earth.way.dto.ReportRequestDto;
 import com.uvg.earth.way.dto.ReportResponseDto;
 import com.uvg.earth.way.model.Report;
 import com.uvg.earth.way.model.User;
@@ -25,7 +26,7 @@ public class ReportService implements IReportService {
     private final UserRepository userRepository;
 
     @Override
-    public ReportResponseDto createReport(Report report) {
+    public ReportResponseDto createReport(ReportRequestDto report) {
         Report newReport = new Report();
         newReport.setTitle(report.getTitle());
         newReport.setDescription(report.getDescription());
@@ -55,7 +56,7 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public ReportResponseDto updateReport(Long idReport, Report report) {
+    public ReportResponseDto updateReport(Long idReport, ReportRequestDto report) {
         Report oldReport = reportRepository.findById(idReport).orElse(null);
         oldReport.setTitle(report.getTitle());
         oldReport.setDescription(report.getDescription());
