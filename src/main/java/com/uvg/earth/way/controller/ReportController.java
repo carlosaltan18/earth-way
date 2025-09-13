@@ -57,6 +57,15 @@ public class ReportController {
             @PathVariable Long id
     ) {
         reportService.deleteReport(id);
-        return  new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RolesAllowed("USER")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ReportResponseDto> updateReport(
+            @PathVariable Long id
+    ) {
+        ReportResponseDto report = reportService.changeStatus(id);
+        return new ResponseEntity<>(report, HttpStatus.OK);
     }
 }

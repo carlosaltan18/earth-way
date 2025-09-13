@@ -69,6 +69,13 @@ public class ReportService implements IReportService {
         reportRepository.deleteById(idReport);
     }
 
+    @Override
+    public ReportResponseDto changeStatus(Long idReport) {
+        Report report = reportRepository.findById(idReport).orElse(null);
+        report.setDone(!report.isDone());
+        return reportToResponseDto(reportRepository.save(report));
+    }
+
     public ReportResponseDto reportToResponseDto(Report report){
         ReportResponseDto reportResponseDto = new ReportResponseDto();
         reportResponseDto.setId(report.getId());

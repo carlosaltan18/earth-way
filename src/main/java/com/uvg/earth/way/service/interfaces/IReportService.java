@@ -11,4 +11,5 @@ public interface IReportService {
     Page<ReportResponseDto> getReports(int page, int pageSize);
     ReportResponseDto updateReport(Long idReport, ReportRequestDto report);
     void deleteReport(Long idReport);
+    ReportResponseDto changeStatus(Long idReport);
 }
