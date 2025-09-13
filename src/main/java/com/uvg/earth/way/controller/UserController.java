@@ -12,9 +12,11 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -99,17 +101,38 @@ public class UserController {
 
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto password) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User customUserDetails = (User) authentication.getPrincipal();
-        userService.changePassword(customUserDetails.getId(),password.getNewPassword(), password.getConfirmPassword());
-        return ResponseEntity.ok("Password changed");
+    public ResponseEntity<Map<String, Object>> changePassword(@RequestBody ChangePasswordDto password) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User customUserDetails = (User) authentication.getPrincipal();
+
+            userService.changePassword(
+                    customUserDetails.getId(),
+                    password.getNewPassword(),
+                    password.getConfirmPassword()
+            );
+
+            response.put("message", "Password changed successfully");
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            response.put("error", "Passwords do not match or invalid input");
+            return ResponseEntity.badRequest().body(response);
+
+        } catch (UsernameNotFoundException e) {
+            response.put("error", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception e) {
+            response.put("error", "An unexpected error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     @RolesAllowed({ADMIN})
     @PutMapping("/update/{idUser}")
-    public ResponseEntity<Map<String, String>> updateUserId(@PathVariable Long idUser, @RequestBody UserDto userDto) {
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> updateUserId(@PathVariable Long idUser, @RequestBody UserDto userDto) {
+        Map<String, Object> response = new HashMap<>();
         try{
             userService.updateUser(userDto, idUser);
             response.put(MESSAGE, "User Updated Successfully");
@@ -123,8 +146,8 @@ public class UserController {
 
     @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @PutMapping("/update")
-    public ResponseEntity<Map<String, String>> updateUser( @RequestBody UserDto userDto) {
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> updateUser( @RequestBody UserDto userDto) {
+        Map<String, Object> response = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User customUserDetails = (User) authentication.getPrincipal();
         try{
