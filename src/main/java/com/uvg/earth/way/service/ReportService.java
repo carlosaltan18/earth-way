@@ -1,5 +1,7 @@
 package com.uvg.earth.way.service;
 
+import com.uvg.earth.way.dto.ReportRequestDto;
+import com.uvg.earth.way.dto.ReportResponseDto;
 import com.uvg.earth.way.model.Report;
 import com.uvg.earth.way.model.User;
 import com.uvg.earth.way.repository.ReportRepository;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Service
@@ -23,7 +26,7 @@ public class ReportService implements IReportService {
     private final UserRepository userRepository;
 
     @Override
-    public Report createReport(Report report) {
+    public ReportResponseDto createReport(ReportRequestDto report) {
         Report newReport = new Report();
         newReport.setTitle(report.getTitle());
         newReport.setDescription(report.getDescription());
@@ -37,32 +40,51 @@ public class ReportService implements IReportService {
         newReport.setAuthor(user);
         newReport.setDone(false);
 
-        return reportRepository.save(newReport);
+        return reportToResponseDto(reportRepository.save(newReport));
     }
 
     @Override
-    public Report getReport(Long idReport) {
-        return reportRepository.findById(idReport).orElse(null);
+    public ReportResponseDto getReport(Long idReport) {
+        return reportToResponseDto(Objects.requireNonNull(reportRepository.findById(idReport).orElse(null)));
     }
 
     @Override
-    public Page<Report> getReports(int page, int pageSize) {
+    public Page<ReportResponseDto> getReports(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return reportRepository.findAll(pageable);
+        Page<Report> reports = reportRepository.findAll(pageable);
+        return reports.map(this::reportToResponseDto);
     }
 
     @Override
-    public Report updateReport(Long idReport, Report report) {
-        Report oldReport = getReport(idReport);
+    public ReportResponseDto updateReport(Long idReport, ReportRequestDto report) {
+        Report oldReport = reportRepository.findById(idReport).orElse(null);
         oldReport.setTitle(report.getTitle());
         oldReport.setDescription(report.getDescription());
 
-        return reportRepository.save(oldReport);
+        return reportToResponseDto(reportRepository.save(oldReport));
     }
 
     @Override
     public void deleteReport(Long idReport) {
         reportRepository.deleteById(idReport);
+    }
+
+    @Override
+    public ReportResponseDto changeStatus(Long idReport) {
+        Report report = reportRepository.findById(idReport).orElse(null);
+        report.setDone(!report.isDone());
+        return reportToResponseDto(reportRepository.save(report));
+    }
+
+    public ReportResponseDto reportToResponseDto(Report report){
+        ReportResponseDto reportResponseDto = new ReportResponseDto();
+        reportResponseDto.setId(report.getId());
+        reportResponseDto.setTitle(report.getTitle());
+        reportResponseDto.setDescription(report.getDescription());
+        reportResponseDto.setDate(report.getDate());
+        reportResponseDto.setAuthor(report.getAuthor().getUsername());
+        reportResponseDto.setDone(report.isDone());
+        return reportResponseDto;
     }
 
 }
