@@ -3,32 +3,33 @@
 # ==========================
 FROM eclipse-temurin:21-jdk AS build
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar el archivo pom y descargar dependencias primero (mejora el cache)
-COPY pom.xml .
+# Copiamos los archivos de Maven Wrapper
 COPY .mvn .mvn
 COPY mvnw .
+COPY pom.xml .
+
+# Damos permisos de ejecución al mvnw (esto corrige tu error)
+RUN chmod +x mvnw
+
+# Descargamos dependencias (usa el wrapper con permisos)
 RUN ./mvnw dependency:go-offline
 
-# Copiar el resto del código y compilar
+# Copiamos el resto del código fuente
 COPY src ./src
+
+# Compilamos el proyecto
 RUN ./mvnw clean package -DskipTests
 
 # ==========================
-# ETAPA 2: Imagen de ejecución
+# ETAPA 2: Imagen final ligera
 # ==========================
 FROM eclipse-temurin:21-jre
 
-# Directorio de la app
 WORKDIR /app
 
-# Copiar el JAR generado desde la etapa anterior
 COPY --from=build /app/target/*.jar app.jar
 
-# Puerto expuesto (Fly.io lo detectará automáticamente)
 EXPOSE 8080
-
-# Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
