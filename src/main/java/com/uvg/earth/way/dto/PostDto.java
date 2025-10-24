@@ -19,8 +19,7 @@ public class PostDto {
     private String content;
     private LocalDate postDate;
     private List<String> images;
-    private UserDto author;
-
+    private UserPostDto author; // 🔄 Ahora usa el nuevo DTO
 
     public PostDto(Post post, UserService userService) {
         this.id = post.getId();
@@ -32,7 +31,8 @@ public class PostDto {
         if (post.getAuthor() != null && post.getAuthor().getId() != null) {
             User userEntity = userService.findById(post.getAuthor().getId()).orElse(null);
             if (userEntity != null) {
-                this.author = new UserDto(
+                this.author = new UserPostDto(
+                        userEntity.getId(),      
                         userEntity.getName(),
                         userEntity.getSurname(),
                         userEntity.getEmail(),

@@ -43,8 +43,9 @@ public class OrganizationService {
     /**
      * Crear nueva organización
      */
-    public OrganizationResponseDto createOrganization(OrganizationRequestDto requestDto, Long creatorId) {
+    public OrganizationResponseDto createOrganization(OrganizationRequestDto requestDto) {
         // Buscar el usuario creator
+        Long creatorId = requestDto.getCreatorId();
         User creator = userRepository.findById(creatorId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + creatorId));
 
