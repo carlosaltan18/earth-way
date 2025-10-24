@@ -29,7 +29,6 @@ public class ReportController {
         return new ResponseEntity<>(newReport, HttpStatus.CREATED);
     }
 
-    @RolesAllowed({USER, ADMIN, ORGANIZATION})
     @GetMapping
     public Page<ReportResponseDto> getAllReports(
             @RequestParam(defaultValue = "0") int page,

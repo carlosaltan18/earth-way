@@ -48,7 +48,6 @@ public class ReportService implements IReportService {
 
         GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
         Point point = factory.createPoint(new Coordinate(report.getLongitude(), report.getLatitude()));
-
         newReport.setLocation(point);
 
         return reportToResponseDto(reportRepository.save(newReport));
@@ -71,6 +70,10 @@ public class ReportService implements IReportService {
         Report oldReport = reportRepository.findById(idReport).orElse(null);
         oldReport.setTitle(report.getTitle());
         oldReport.setDescription(report.getDescription());
+
+        GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point point = factory.createPoint(new Coordinate(report.getLongitude(), report.getLatitude()));
+        oldReport.setLocation(point);
 
         return reportToResponseDto(reportRepository.save(oldReport));
     }
