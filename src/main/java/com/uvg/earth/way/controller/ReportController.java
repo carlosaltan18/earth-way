@@ -18,14 +18,18 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @RolesAllowed("USER")
+    private final static String ADMIN = "ADMIN";
+    private final static String USER = "USER";
+    private final static String ORGANIZATION = "ORGANIZATION";
+
+    @RolesAllowed({ADMIN})
     @PostMapping
     public ResponseEntity<ReportResponseDto> createReport(@RequestBody ReportRequestDto report) {
         ReportResponseDto newReport = reportService.createReport(report);
         return new ResponseEntity<>(newReport, HttpStatus.CREATED);
     }
 
-    @RolesAllowed("USER")
+    @RolesAllowed({USER, ADMIN, ORGANIZATION})
     @GetMapping
     public Page<ReportResponseDto> getAllReports(
             @RequestParam(defaultValue = "0") int page,
@@ -34,14 +38,14 @@ public class ReportController {
         return reportService.getReports(page, size);
     }
 
-    @RolesAllowed("USER")
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{id}")
     public ResponseEntity<ReportResponseDto> getReportById(@PathVariable Long id) {
         ReportResponseDto reportFound = reportService.getReport(id);
         return new ResponseEntity<>(reportFound, HttpStatus.OK);
     }
 
-    @RolesAllowed("USER")
+    @RolesAllowed({ADMIN})
     @PutMapping("/{id}")
     public ResponseEntity<ReportResponseDto> updateReport(
             @PathVariable Long id,
@@ -51,7 +55,7 @@ public class ReportController {
         return new ResponseEntity<>(updatedReport, HttpStatus.OK);
     }
 
-    @RolesAllowed("USER")
+    @RolesAllowed({ADMIN})
     @DeleteMapping("/{id}")
     public ResponseEntity<Report> deleteReport(
             @PathVariable Long id
@@ -60,7 +64,7 @@ public class ReportController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RolesAllowed("USER")
+    @RolesAllowed({ADMIN})
     @PatchMapping("/{id}")
     public ResponseEntity<ReportResponseDto> updateReport(
             @PathVariable Long id

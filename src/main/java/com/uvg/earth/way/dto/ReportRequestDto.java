@@ -6,4 +6,6 @@ import lombok.Data;
 public class ReportRequestDto {
     private String title;
     private String description;
+    private Double latitude;
+    private Double longitude;
 }
