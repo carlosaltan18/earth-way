@@ -8,6 +8,10 @@ import com.uvg.earth.way.repository.ReportRepository;
 import com.uvg.earth.way.repository.UserRepository;
 import com.uvg.earth.way.service.interfaces.IReportService;
 import lombok.AllArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +20,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @AllArgsConstructor
@@ -40,6 +46,10 @@ public class ReportService implements IReportService {
         newReport.setAuthor(user);
         newReport.setDone(false);
 
+        GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point point = factory.createPoint(new Coordinate(report.getLongitude(), report.getLatitude()));
+        newReport.setLocation(point);
+
         return reportToResponseDto(reportRepository.save(newReport));
     }
 
@@ -60,6 +70,10 @@ public class ReportService implements IReportService {
         Report oldReport = reportRepository.findById(idReport).orElse(null);
         oldReport.setTitle(report.getTitle());
         oldReport.setDescription(report.getDescription());
+
+        GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point point = factory.createPoint(new Coordinate(report.getLongitude(), report.getLatitude()));
+        oldReport.setLocation(point);
 
         return reportToResponseDto(reportRepository.save(oldReport));
     }
@@ -84,6 +98,15 @@ public class ReportService implements IReportService {
         reportResponseDto.setDate(report.getDate());
         reportResponseDto.setAuthor(report.getAuthor().getUsername());
         reportResponseDto.setDone(report.isDone());
+
+        Point point = report.getLocation();
+        if(point != null){
+            Map<String, Double> locationMap = new HashMap<>();
+            locationMap.put("latitude", point.getY());  // Y = latitud
+            locationMap.put("longitude", point.getX()); // X = longitud
+            reportResponseDto.setLocation(locationMap);
+        }
+
         return reportResponseDto;
     }
 

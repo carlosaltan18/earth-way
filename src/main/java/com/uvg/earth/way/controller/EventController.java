@@ -33,8 +33,7 @@ public class EventController {
     private final static String USER = "USER";
     private final static String ORGANIZATION = "ORGANIZATION";
 
-    @RolesAllowed({ADMIN, USER, ORGANIZATION})
-    @GetMapping(value = "/")
+    @GetMapping()
     public ResponseEntity<Map<String, Object>> getAllEvents(@RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size,
                                                                  @RequestParam(required= false) String email){
