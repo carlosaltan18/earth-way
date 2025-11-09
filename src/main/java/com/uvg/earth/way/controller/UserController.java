@@ -1,12 +1,15 @@
 package com.uvg.earth.way.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import com.uvg.earth.way.dto.ChangePasswordDto;
 import com.uvg.earth.way.dto.UserDto;
+import com.uvg.earth.way.dto.UserOrgDTO;
 import com.uvg.earth.way.model.User;
+import com.uvg.earth.way.repository.UserRepository;
 import com.uvg.earth.way.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +33,7 @@ public class UserController {
     private final static String ADMIN = "ADMIN";
     private final static String USER = "USER";
     private final static String ORGANIZATION = "ORGANIZATION";
+    private final UserRepository userRepository;
 
     @RolesAllowed({ADMIN})
     @GetMapping("/get-user")
@@ -160,4 +164,49 @@ public class UserController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    @RolesAllowed({ADMIN, ORGANIZATION})
+    @GetMapping("/userorganization")
+    public ResponseEntity<?> getOrganizations() {
+        // Buscar usuarios con rol ORGANIZATION
+        List<User> organizations = userRepository.findByRoleName("ROLE_ORGANIZATION");
+
+        if (organizations == null || organizations.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "status", HttpStatus.NOT_FOUND.value(),
+                            "message", "No se encontraron usuarios con el rol ORGANIZATION",
+                            "data", List.of()
+                    ));
+        }
+
+        // Convertir entidades a DTOs
+        List<UserOrgDTO> response = organizations.stream()
+                .map(UserOrgDTO::fromEntity)
+                .toList();
+
+        // Validar datos dentro de cada usuario (por ejemplo, email y nombre)
+        boolean hasInvalid = response.stream().anyMatch(u ->
+                u.getEmail() == null || u.getEmail().isBlank() ||
+                        u.getName() == null || u.getName().isBlank()
+        );
+
+        if (hasInvalid) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of(
+                            "status", HttpStatus.BAD_REQUEST.value(),
+                            "message", "Algunos usuarios no tienen datos válidos registrados",
+                            "data", response
+                    ));
+        }
+
+        // Respuesta exitosa
+        return ResponseEntity.ok(Map.of(
+                "status", HttpStatus.OK.value(),
+                "message", "Usuarios con rol ORGANIZATION obtenidos correctamente",
+                "data", response
+        ));
+    }
+
+
 }
