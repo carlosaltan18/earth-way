@@ -43,6 +43,12 @@ public class User implements UserDetails{
     private String email;
     @NotBlank(message = "Debe ingresar una contraseña")
     private String password;
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
     @NotBlank(message = "Debe ingresar su telefono")
     private String phone;
     @ManyToMany( fetch = FetchType.EAGER )
