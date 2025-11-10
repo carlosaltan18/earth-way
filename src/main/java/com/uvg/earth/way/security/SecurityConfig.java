@@ -1,5 +1,6 @@
 package com.uvg.earth.way.security;
 
+import com.uvg.earth.way.configuration.JwtAccessDeniedHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.uvg.earth.way.configuration.JwtAuthenticationEntryPoint;
 
+import java.lang.reflect.Method;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(jsr250Enabled = true)
@@ -23,6 +26,7 @@ public class SecurityConfig {
     private JwtAuthFilter jwtAuthFilter;
     private AuthenticationProvider authenticationProvider;
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     private static final String ADMIN = "ROLE_ADMIN";
     private static final String USER = "ROLE_USER";
@@ -34,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/swagger-ui.html").permitAll()
+                                .requestMatchers("/", "/swagger-ui.html").permitAll()
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/swagger-resources/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
@@ -43,14 +47,20 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/post/listPost").permitAll()
                                 .requestMatchers("/api/v1/post/**").hasAnyAuthority(USER, ADMIN)
                                 .requestMatchers("/api/v1/user/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
-                                .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN)
+                                .requestMatchers("/api/v1/organization/**").hasAnyAuthority(ADMIN, ORGANIZATION)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/report").permitAll()
                                 .requestMatchers("/api/v1/report/**").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
                                 .requestMatchers("/api/v1/role/**").hasAnyAuthority(ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/event").permitAll()
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/event/*").hasAnyAuthority(USER, ADMIN, ORGANIZATION)
 
                                 .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+
+                .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)  // 401 → sin autenticación
+                .accessDeniedHandler(jwtAccessDeniedHandler)            // 403 → sin permisos
+        )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

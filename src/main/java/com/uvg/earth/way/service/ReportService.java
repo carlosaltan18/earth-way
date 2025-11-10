@@ -1,11 +1,17 @@
 package com.uvg.earth.way.service;
 
+import com.uvg.earth.way.dto.ReportRequestDto;
+import com.uvg.earth.way.dto.ReportResponseDto;
 import com.uvg.earth.way.model.Report;
 import com.uvg.earth.way.model.User;
 import com.uvg.earth.way.repository.ReportRepository;
 import com.uvg.earth.way.repository.UserRepository;
 import com.uvg.earth.way.service.interfaces.IReportService;
 import lombok.AllArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Service
@@ -23,7 +32,7 @@ public class ReportService implements IReportService {
     private final UserRepository userRepository;
 
     @Override
-    public Report createReport(Report report) {
+    public ReportResponseDto createReport(ReportRequestDto report) {
         Report newReport = new Report();
         newReport.setTitle(report.getTitle());
         newReport.setDescription(report.getDescription());
@@ -37,32 +46,68 @@ public class ReportService implements IReportService {
         newReport.setAuthor(user);
         newReport.setDone(false);
 
-        return reportRepository.save(newReport);
+        GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point point = factory.createPoint(new Coordinate(report.getLongitude(), report.getLatitude()));
+        newReport.setLocation(point);
+
+        return reportToResponseDto(reportRepository.save(newReport));
     }
 
     @Override
-    public Report getReport(Long idReport) {
-        return reportRepository.findById(idReport).orElse(null);
+    public ReportResponseDto getReport(Long idReport) {
+        return reportToResponseDto(Objects.requireNonNull(reportRepository.findById(idReport).orElse(null)));
     }
 
     @Override
-    public Page<Report> getReports(int page, int pageSize) {
+    public Page<ReportResponseDto> getReports(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return reportRepository.findAll(pageable);
+        Page<Report> reports = reportRepository.findAll(pageable);
+        return reports.map(this::reportToResponseDto);
     }
 
     @Override
-    public Report updateReport(Long idReport, Report report) {
-        Report oldReport = getReport(idReport);
+    public ReportResponseDto updateReport(Long idReport, ReportRequestDto report) {
+        Report oldReport = reportRepository.findById(idReport).orElse(null);
         oldReport.setTitle(report.getTitle());
         oldReport.setDescription(report.getDescription());
 
-        return reportRepository.save(oldReport);
+        GeometryFactory factory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point point = factory.createPoint(new Coordinate(report.getLongitude(), report.getLatitude()));
+        oldReport.setLocation(point);
+
+        return reportToResponseDto(reportRepository.save(oldReport));
     }
 
     @Override
     public void deleteReport(Long idReport) {
         reportRepository.deleteById(idReport);
+    }
+
+    @Override
+    public ReportResponseDto changeStatus(Long idReport) {
+        Report report = reportRepository.findById(idReport).orElse(null);
+        report.setDone(!report.isDone());
+        return reportToResponseDto(reportRepository.save(report));
+    }
+
+    public ReportResponseDto reportToResponseDto(Report report){
+        ReportResponseDto reportResponseDto = new ReportResponseDto();
+        reportResponseDto.setId(report.getId());
+        reportResponseDto.setTitle(report.getTitle());
+        reportResponseDto.setDescription(report.getDescription());
+        reportResponseDto.setDate(report.getDate());
+        reportResponseDto.setAuthor(report.getAuthor().getUsername());
+        reportResponseDto.setDone(report.isDone());
+
+        Point point = report.getLocation();
+        if(point != null){
+            Map<String, Double> locationMap = new HashMap<>();
+            locationMap.put("latitude", point.getY());  // Y = latitud
+            locationMap.put("longitude", point.getX()); // X = longitud
+            reportResponseDto.setLocation(locationMap);
+        }
+
+        return reportResponseDto;
     }
 
 }

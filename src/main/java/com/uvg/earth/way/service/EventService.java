@@ -80,12 +80,12 @@ public class EventService implements IEventService {
      */
     @Override
     public void updateEvent(EventDto eventDto, Long idEvent) {
-        validateEventDto(idEvent);
         Optional<Event> eventOptional = eventRepository.findById(idEvent);
 
         if (eventOptional.isPresent()) {
             Event event = eventOptional.get();
 
+            System.out.println(event);
             // Updating basic fields
             if (eventDto.getName() != null && !eventDto.getName().trim().isEmpty()) {
                 event.setName(eventDto.getName());
@@ -99,7 +99,7 @@ public class EventService implements IEventService {
             if (eventDto.getDate() != null) {
                 event.setDate(eventDto.getDate());
             }
-            /**
+
             if (eventDto.getLatitude() != null && eventDto.getLongitude() != null) {
                 Point point = geometryFactory.createPoint(
                         new Coordinate(eventDto.getLongitude(), eventDto.getLatitude())
@@ -107,14 +107,14 @@ public class EventService implements IEventService {
                 point.setSRID(4326);
                 event.setLocation(point);
             }
-                **/
+
             event.setFinished(eventDto.isFinished());
 
             // Update organizer
             addingOrganizer(eventDto, event);
 
             // Update organization if provided
-           // updateOrganization(eventDto, event);
+           updateOrganization(eventDto, event);
 
             // Update participants if provided
             //updateParticipants(eventDto, event);
@@ -125,15 +125,6 @@ public class EventService implements IEventService {
         }
     }
 
-    /**
-     * Validates if an event exists
-     * @param idEvent
-     */
-    public void validateEventDto(Long idEvent) {
-        if (!eventRepository.existsById(idEvent)) {
-            throw new EntityNotFoundException("Evento " + idEvent + " no existe");
-        }
-    }
 
     /**
      * Adds or updates organizer for an event
@@ -154,14 +145,14 @@ public class EventService implements IEventService {
      * @param eventDto
      * @param event
      */
-   /* public void updateOrganization(EventDto eventDto, Event event) {
+    public void updateOrganization(EventDto eventDto, Event event) {
         if (eventDto.getIdOrganization() != null) {
-            Organization organization = organizationService.findById(eventDto.getIdOrganization())
+            Organization organization = organizationService.findEntityById(eventDto.getIdOrganization())
                     .orElseThrow(() -> new EntityNotFoundException("Organización no encontrada."));
 
             event.setOrganization(organization);
         }
-    }*/
+    }
 
     /**
      * Updates participants for an event
@@ -174,7 +165,7 @@ public class EventService implements IEventService {
             List<User> participants = new ArrayList<>();
 
             for (UserEventDto userDto : eventDto.getParticipants()) {
-                if (userDto.getId() != null) {
+                if (userDto.getId() != 0) {
                     User participant = userService.findById(userDto.getId())
                             .orElseThrow(() -> new EntityNotFoundException("Participante no encontrado con id: " + userDto.getId()));
                     participants.add(participant);
@@ -203,14 +194,17 @@ public class EventService implements IEventService {
      * @return Page of events
      */
     @Override
-    public Page<Event> getAllEvents(int page, int size, String name) {
+    public Page<EventDto> getAllEvents(int page, int size, String name) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc("name")));
 
+        Page<Event> events;
         if (name != null && !name.isEmpty()) {
-            return eventRepository.findByNameContainingIgnoreCase(name, pageable);
+            events = eventRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else {
+            events = eventRepository.findAll(pageable);
         }
 
-        return eventRepository.findAll(pageable);
+        return events.map(this::convertToDto);
     }
 
     /**
@@ -314,7 +308,7 @@ public class EventService implements IEventService {
             List<User> participants = new ArrayList<>();
 
             for (UserEventDto userDto : eventDto.getParticipants()) {
-                if (userDto.getId() != null) {
+                if (userDto.getId() != 0) {
                     User participant = userService.findById(userDto.getId())
                             .orElseThrow(() -> new EntityNotFoundException("Participante no encontrado con id: " + userDto.getId()));
                     participants.add(participant);
@@ -390,16 +384,17 @@ public class EventService implements IEventService {
     public EventDto convertToDto(Event event) {
         EventDto dto = new EventDto();
 
+        dto.setId(event.getId());
         dto.setName(event.getName());
         dto.setDescription(event.getDescription());
         dto.setDirection(event.getDirection());
         dto.setDate(event.getDate());
-       /**
+
         if (event.getLocation() != null) {
             dto.setLatitude(event.getLocation().getY()); // Latitud
             dto.setLongitude(event.getLocation().getX()); // Longitud
         }        dto.setFinished(event.isFinished());
-        **/
+
         // Set organizer if exists
         if (event.getOrganizer() != null) {
             dto.setIdOrganizer(event.getOrganizer().getId());
@@ -411,13 +406,13 @@ public class EventService implements IEventService {
         }
 
         // Convert participants to UserDto list
-        /**
+
         if (event.getParticipants() != null && !event.getParticipants().isEmpty()) {
             List<UserEventDto> participantDtos = event.getParticipants().stream()
                     .map(this::convertUserToDto)
                     .collect(Collectors.toList());
             dto.setParticipants(participantDtos);
-        }**/
+        }
 
         return dto;
     }
@@ -438,14 +433,16 @@ public class EventService implements IEventService {
 
     // ================== PARTICIPANT MANAGEMENT ==================
 
+
+
     /**
      * Add a participant to an event
      * @param eventId
      * @param userId
      */
 
-    /**
-    public void addParticipant(Long eventId, Long userId) {
+
+    public void addParticipant(Long eventId, Long userId    ) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
 
@@ -463,7 +460,7 @@ public class EventService implements IEventService {
         } else {
             throw new IllegalArgumentException("El usuario ya es participante del evento");
         }
-    }**/
+    }
 
     /**
      * Remove a participant from an event
@@ -471,7 +468,7 @@ public class EventService implements IEventService {
      * @param userId
      */
 
-    /**
+
     public void removeParticipant(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
@@ -485,20 +482,20 @@ public class EventService implements IEventService {
         } else {
             throw new IllegalArgumentException("El usuario no es participante del evento");
         }
-    }**/
+    }
 
     /**
      * Get all participants of an event
      * @param eventId
      * @return List of participants
      */
-    /**
+
     public List<User> getEventParticipants(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
 
         return event.getParticipants() != null ? event.getParticipants() : new ArrayList<>();
-    }**/
+    }
 
     /**
      * Get events where a user is a participant
@@ -506,7 +503,7 @@ public class EventService implements IEventService {
      * @return List of events
      */
 
-    /**
+/**
     public List<Event> getEventsByParticipant(Long userId) {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + userId));
@@ -514,15 +511,15 @@ public class EventService implements IEventService {
         return eventRepository.findAll().stream()
                 .filter(event -> event.getParticipants() != null && event.getParticipants().contains(user))
                 .collect(Collectors.toList());
-    }**/
-
+    }
+**/
     /**
      * Check if a user is a participant in an event
      * @param eventId
      * @param userId
      * @return boolean
      */
-    /**
+/**
     public boolean isUserParticipant(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
@@ -531,21 +528,21 @@ public class EventService implements IEventService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + userId));
 
         return event.getParticipants() != null && event.getParticipants().contains(user);
-    }**/
-
+    }
+**/
     /**
      * Get participant count for an event
      * @param eventId
      * @return int
      */
 
-    /**
+
     public int getParticipantCount(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con id: " + eventId));
 
         return event.getParticipants() != null ? event.getParticipants().size() : 0;
-    }**/
+    }
 
 
 }

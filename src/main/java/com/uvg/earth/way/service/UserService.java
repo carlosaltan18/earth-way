@@ -1,5 +1,6 @@
 package com.uvg.earth.way.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.uvg.earth.way.dto.UserDto;
@@ -120,7 +121,5 @@ public class UserService implements IUserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
-
-
 
 }

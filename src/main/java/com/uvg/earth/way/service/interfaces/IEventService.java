@@ -18,6 +18,6 @@ public interface IEventService {
 
     Optional<Event> findById(Long idEvent);
 
-    Page<Event> getAllEvents(int page, int size, String name);
+    Page<EventDto> getAllEvents(int page, int size, String name);
 
 }
