@@ -277,11 +277,12 @@ public class EventService implements IEventService {
         event.setFinished(eventDto.isFinished());
 
         // Assign organizer if provided
-        if (eventDto.getIdOrganizer() != null) {
+
+        /**if (eventDto.getIdOrganizer() != null) {
             User organizer = userService.findById(eventDto.getIdOrganizer())
                     .orElseThrow(() -> new EntityNotFoundException("Organizador no encontrado con id: " + eventDto.getIdOrganizer()));
             event.setOrganizer(organizer);
-        }
+        }**/
 
         // Assign organization if provided
         if (eventDto.getIdOrganization() != null) {
@@ -291,6 +292,14 @@ public class EventService implements IEventService {
                     ));
 
             event.setOrganization(organization);
+
+            if (organization.getCreator() == null) {
+                throw new IllegalStateException("La organización no tiene un organizer asignado.");
+            }
+
+            // Asignar organizer desde la organización
+            event.setOrganizer(organization.getCreator());
+
         }
 
         // Assign participants if provided
