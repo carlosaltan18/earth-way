@@ -7,7 +7,10 @@ import com.uvg.earth.way.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import com.uvg.earth.way.model.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +34,11 @@ public class PostController {
     public ResponseEntity<Map<String, Object>> createPost(@RequestBody Post post) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // Set author from authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User customUserDetails = (User) authentication.getPrincipal();
+            post.setAuthor(customUserDetails);
+
             Post createdPost = postService.createPost(post);
             PostDto postDto = new PostDto(createdPost, userService);
             response.put("payload", postDto);
@@ -47,10 +55,16 @@ public class PostController {
     @PutMapping("/put-post/{id}")
     public ResponseEntity<Map<String, Object>> updatePost(@PathVariable Long id,
                                                           @RequestBody Post post,
-                                                          @RequestParam Long userId) {
+                                                          @RequestParam(required = false) Long userId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Post updatedPost = postService.updatePost(id, post, userId);
+            // prefer authenticated user id, fallback to provided param if present
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User customUserDetails = (User) authentication.getPrincipal();
+            Long authUserId = customUserDetails.getId();
+            Long effectiveUserId = userId != null ? userId : authUserId;
+
+            Post updatedPost = postService.updatePost(id, post, effectiveUserId);
             PostDto postDto = new PostDto(updatedPost, userService);
             response.put("payload", postDto);
             response.put(MESSAGE, "Post updated successfully");
@@ -65,10 +79,16 @@ public class PostController {
     @RolesAllowed({USER})
     @DeleteMapping("/delete-post/user/{id}")
     public ResponseEntity<Map<String, Object>> deletePost(@PathVariable Long id,
-                                                          @RequestParam Long userId) {
+                                                          @RequestParam(required = false) Long userId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            postService.deletePost(id, userId);
+            // prefer authenticated user id, fallback to provided param if present
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User customUserDetails = (User) authentication.getPrincipal();
+            Long authUserId = customUserDetails.getId();
+            Long effectiveUserId = userId != null ? userId : authUserId;
+
+            postService.deletePost(id, effectiveUserId);
             response.put(MESSAGE, "Post deleted successfully");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
