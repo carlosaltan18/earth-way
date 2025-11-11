@@ -1,8 +1,15 @@
 package com.uvg.earth.way.service;
 
 import com.uvg.earth.way.model.Post;
+import com.uvg.earth.way.model.User;
 import com.uvg.earth.way.repository.PostRepository;
+import com.uvg.earth.way.repository.UserRepository;
 import com.uvg.earth.way.exception.ResourceNotFoundException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -12,13 +19,23 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRespository;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRespository) {
         this.postRepository = postRepository;
+        this.userRespository = userRespository;
     }
 
-    public Post createPost(Post post) {
+    public Post createPost(Post post){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userRespository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+
+        post.setAuthor(user);
         post.setPostDate(LocalDate.now());
+
         return postRepository.save(post);
     }
 

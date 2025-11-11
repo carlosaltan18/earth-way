@@ -28,17 +28,15 @@ public class PostDto {
         this.postDate = post.getPostDate();
         this.images = post.getImages();
 
-        if (post.getAuthor() != null && post.getAuthor().getId() != null) {
-            User userEntity = userService.findById(post.getAuthor().getId()).orElse(null);
-            if (userEntity != null) {
-                this.author = new UserPostDto(
-                        userEntity.getId(),      
-                        userEntity.getName(),
-                        userEntity.getSurname(),
-                        userEntity.getEmail(),
-                        userEntity.getPhone()
-                );
-            }
+        // Map author directly from the Post entity to avoid an extra DB lookup
+        if (post.getAuthor() != null) {
+            this.author = new UserPostDto(
+                    post.getAuthor().getId(),
+                    post.getAuthor().getName(),
+                    post.getAuthor().getSurname(),
+                    post.getAuthor().getEmail(),
+                    post.getAuthor().getPhone()
+            );
         }
     }
 }
