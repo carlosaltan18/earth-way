@@ -29,11 +29,12 @@ public class OrganizationController {
     private static final String ERROR = "error";
     private final static String ADMIN = "ADMIN";
     private final static String USER = "USER";
+    private final static String ORGANIZATION = "ORGANIZATION";
     /**
      * Obtener todas las organizaciones con paginación
      * GET /api/v1/organization?page=0&size=10
      */
-    @RolesAllowed({ADMIN})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> getAllOrganizations(
             @RequestParam(defaultValue = "0") int page,
@@ -64,7 +65,7 @@ public class OrganizationController {
      * Obtener organización por ID
      * GET /api/v1/organization/{id}
      */
-    @RolesAllowed({ADMIN})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getOrganizationById(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
@@ -179,7 +180,7 @@ public class OrganizationController {
      * Buscar organización por nombre
      * GET /api/v1/organization/search?name=nombreOrganizacion
      */
-    @RolesAllowed({ADMIN})
+    @RolesAllowed({ADMIN, USER, ORGANIZATION})
     @GetMapping("/search")
     public ResponseEntity<Map<String, Object>> getOrganizationByName(
             @RequestParam String name) {
